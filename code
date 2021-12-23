@@ -1,0 +1,575 @@
+
+library(usdm)
+library(MASS)
+
+#subsetting data according to atom type
+variables = colnames(protein)
+accuracy = protein$accuracy
+angles = protein$angles
+carbonylC = protein[,variables[grep("carbonylC", variables)]]
+carboxylC = protein[,variables[grep("carboxylC", variables)]]
+aliph1HC = protein[,variables[grep("aliph1HC", variables)]]
+aliph2HC = protein[,variables[grep("aliph2HC", variables)]]
+aliph3HC = protein[,variables[grep("aliph3HC", variables)]]
+aromaticC = protein[,variables[grep("aromaticC", variables)]]
+scAGN = protein[,variables[grep("scAGN", variables)]]
+scLysN = protein[,variables[grep("scLysN", variables)]]
+scArgN = protein[,variables[grep("scArgN", variables)]]
+bbProN = protein[,variables[grep("bbProN", variables)]]
+hydroxylO = protein[,variables[grep("hydroxylO", variables)]]
+carbonylO = protein[,variables[grep("carbonylO", variables)]]
+carboxylO = protein[,variables[grep("carboxylO", variables)]]
+bbN = protein[,variables[grep("bbN", variables)]]
+sulfur = protein[,variables[grep("sulfur", variables)]]
+bbCA = protein[,variables[grep("bbCA", variables)]]
+bbC = protein[,variables[grep("bbC_", variables)]]
+bbO = protein[,variables[grep("bbO", variables)]]
+
+# finding cases of multicollinearity
+# for carbonylC
+carbonylC.vif<- vifstep(carbonylC, 10) # calculates vif for all variables and removes variables with vif >=10
+carbonylC.vifvar<-as.character(slot(carbonylC.vif, "variables")) # selects variables with no multicollinearity
+# new dataset of non-multicollinear strutures containing carbonylC and accuracy
+newcarbonylC <- data.frame(accuracy, protein[c(which(variables %in% carbonylC.vifvar))]) 
+
+
+# fitting the model
+# for carbonylC
+N <- nrow(protein)
+set.seed(12345678)
+trainInd <- sample(1:N, round(N*0.8), replace=F)
+newcarbonylC.trainSet <- newcarbonylC[trainInd,]
+newcarbonylC.validSet <- newcarbonylC[-trainInd,]
+
+carbonylC.full <- lm(accuracy ~ ., data = newcarbonylC.trainSet)
+carbonylC.empty <- lm(accuracy ~ 1, data =newcarbonylC.trainSet)
+
+carbonylC.model<-stepAIC(object = carbonylC.empty , scope = list(upper = carbonylC.full, lower = carbonylC.empty), direction = "forward", k = log(nrow(newcarbonylC.trainSet)))
+carbonylC.labels<-attr(carbonylC.model$terms , "term.labels") # select out the explanatory variables in the best model
+carbonylC.num.fit <- length(carbonylC.labels) #number of models fitted
+
+###
+
+# finding cases of multicollinearity
+# for carboxylC
+carboxylC.vif<- vifstep(carboxylC, 10) # calculates vif for all variables and removes variables with vif >=10
+carboxylC.vifvar<-as.character(slot(carboxylC.vif, "variables")) # selects variables with no multicollinearity
+# new dataset of non-multicollinear strutures containing carboxylC and accuracy
+newcarboxylC <- data.frame(accuracy, protein[c(which(variables %in% carboxylC.vifvar))]) 
+
+
+# fitting the model
+# for carboxylC
+newcarboxylC.trainSet <- newcarboxylC[trainInd,]
+newcarboxylC.validSet <- newcarboxylC[-trainInd,]
+
+carboxylC.full <- lm(accuracy ~ ., data = newcarboxylC.trainSet)
+carboxylC.empty <- lm(accuracy ~ 1, data =newcarboxylC.trainSet)
+
+carboxylC.model<-stepAIC(object = carboxylC.empty , scope = list(upper = carboxylC.full, lower = carboxylC.empty), direction = "forward", k = log(nrow(newcarboxylC.trainSet)))
+carboxylC.labels<-attr(carboxylC.model$terms , "term.labels") # select out the explanatory variables in the best model
+carboxylC.num.fit <- length(carboxylC.labels) #number of models fitted
+
+###
+
+# finding cases of multicollinearity
+# for aliph1HC
+aliph1HC.vif<- vifstep(aliph1HC, 10) 
+aliph1HC.vifvar<-as.character(slot(aliph1HC.vif, "variables")) 
+newaliph1HC <- data.frame(accuracy, protein[c(which(variables %in% aliph1HC.vifvar))]) 
+
+
+# fitting the model
+# for aliph1HC
+newaliph1HC.trainSet <- newaliph1HC[trainInd,]
+newaliph1HC.validSet <- newaliph1HC[-trainInd,]
+
+aliph1HC.full <- lm(accuracy ~ ., data = newaliph1HC.trainSet)
+aliph1HC.empty <- lm(accuracy ~ 1, data =newaliph1HC.trainSet)
+
+aliph1HC.model<-stepAIC(object = aliph1HC.empty , scope = list(upper = aliph1HC.full, lower = aliph1HC.empty), direction = "forward", k = log(nrow(newaliph1HC.trainSet)))
+aliph1HC.labels<-attr(aliph1HC.model$terms , "term.labels") 
+aliph1HC.num.fit <- length(aliph1HC.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for aliph2HC
+aliph2HC.vif<- vifstep(aliph2HC, 10) 
+aliph2HC.vifvar<-as.character(slot(aliph2HC.vif, "variables")) 
+newaliph2HC <- data.frame(accuracy, protein[c(which(variables %in% aliph2HC.vifvar))]) 
+
+
+# fitting the model
+# for aliph2HC
+newaliph2HC.trainSet <- newaliph2HC[trainInd,]
+newaliph2HC.validSet <- newaliph2HC[-trainInd,]
+
+aliph2HC.full <- lm(accuracy ~ ., data = newaliph2HC.trainSet)
+aliph2HC.empty <- lm(accuracy ~ 1, data =newaliph2HC.trainSet)
+
+aliph2HC.model<-stepAIC(object = aliph2HC.empty , scope = list(upper = aliph2HC.full, lower = aliph2HC.empty), direction = "forward", k = log(nrow(newaliph2HC.trainSet)))
+aliph2HC.labels<-attr(aliph2HC.model$terms , "term.labels") 
+aliph2HC.num.fit <- length(aliph2HC.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for aliph3HC
+aliph3HC.vif<- vifstep(aliph3HC, 10) 
+aliph3HC.vifvar<-as.character(slot(aliph3HC.vif, "variables")) 
+newaliph3HC <- data.frame(accuracy, protein[c(which(variables %in% aliph3HC.vifvar))]) 
+
+
+# fitting the model
+# for aliph3HC
+newaliph3HC.trainSet <- newaliph3HC[trainInd,]
+newaliph3HC.validSet <- newaliph3HC[-trainInd,]
+
+aliph3HC.full <- lm(accuracy ~ ., data = newaliph3HC.trainSet)
+aliph3HC.empty <- lm(accuracy ~ 1, data =newaliph3HC.trainSet)
+
+aliph3HC.model<-stepAIC(object = aliph3HC.empty , scope = list(upper = aliph3HC.full, lower = aliph3HC.empty), direction = "forward", k = log(nrow(newaliph3HC.trainSet)))
+aliph3HC.labels<-attr(aliph3HC.model$terms , "term.labels") 
+aliph3HC.num.fit <- length(aliph3HC.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for aromaticC
+aromaticC.vif<- vifstep(aromaticC, 10) 
+aromaticC.vifvar<-as.character(slot(aromaticC.vif, "variables")) 
+newaromaticC <- data.frame(accuracy, protein[c(which(variables %in% aromaticC.vifvar))]) 
+
+
+# fitting the model
+# for aromaticC
+newaromaticC.trainSet <- newaromaticC[trainInd,]
+newaromaticC.validSet <- newaromaticC[-trainInd,]
+
+aromaticC.full <- lm(accuracy ~ ., data = newaromaticC.trainSet)
+aromaticC.empty <- lm(accuracy ~ 1, data =newaromaticC.trainSet)
+
+aromaticC.model<-stepAIC(object = aromaticC.empty , scope = list(upper = aromaticC.full, lower = aromaticC.empty), direction = "forward", k = log(nrow(newaromaticC.trainSet)))
+aromaticC.labels<-attr(aromaticC.model$terms , "term.labels") 
+aromaticC.num.fit <- length(aromaticC.labels) 
+
+###
+# finding cases of multicollinearity
+# for scAGN
+scAGN.vif<- vifstep(scAGN, 10) 
+scAGN.vifvar<-as.character(slot(scAGN.vif, "variables")) 
+newscAGN <- data.frame(accuracy, protein[c(which(variables %in% scAGN.vifvar))]) 
+
+
+# fitting the model
+# for scAGN
+newscAGN.trainSet <- newscAGN[trainInd,]
+newscAGN.validSet <- newscAGN[-trainInd,]
+
+scAGN.full <- lm(accuracy ~ ., data = newscAGN.trainSet)
+scAGN.empty <- lm(accuracy ~ 1, data =newscAGN.trainSet)
+
+scAGN.model<-stepAIC(object = scAGN.empty , scope = list(upper = scAGN.full, lower = scAGN.empty), direction = "forward", k = log(nrow(newscAGN.trainSet)))
+scAGN.labels<-attr(scAGN.model$terms , "term.labels") 
+scAGN.num.fit <- length(scAGN.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for scLysN
+scLysN.vif<- vifstep(scLysN, 10) 
+scLysN.vifvar<-as.character(slot(scLysN.vif, "variables")) 
+newscLysN <- data.frame(accuracy, protein[c(which(variables %in% scLysN.vifvar))]) 
+
+
+# fitting the model
+# for scLysN
+newscLysN.trainSet <- newscLysN[trainInd,]
+newscLysN.validSet <- newscLysN[-trainInd,]
+
+scLysN.full <- lm(accuracy ~ ., data = newscLysN.trainSet)
+scLysN.empty <- lm(accuracy ~ 1, data =newscLysN.trainSet)
+
+scLysN.model<-stepAIC(object = scLysN.empty , scope = list(upper = scLysN.full, lower = scLysN.empty), direction = "forward", k = log(nrow(newscLysN.trainSet)))
+scLysN.labels<-attr(scLysN.model$terms , "term.labels") 
+scLysN.num.fit <- length(scLysN.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for scArgN
+scArgN.vif<- vifstep(scArgN, 10) 
+scArgN.vifvar<-as.character(slot(scArgN.vif, "variables")) 
+newscArgN <- data.frame(accuracy, protein[c(which(variables %in% scArgN.vifvar))]) 
+
+
+# fitting the model
+# for scArgN
+newscArgN.trainSet <- newscArgN[trainInd,]
+newscArgN.validSet <- newscArgN[-trainInd,]
+
+scArgN.full <- lm(accuracy ~ ., data = newscArgN.trainSet)
+scArgN.empty <- lm(accuracy ~ 1, data =newscArgN.trainSet)
+
+scArgN.model<-stepAIC(object = scArgN.empty , scope = list(upper = scArgN.full, lower = scArgN.empty), direction = "forward", k = log(nrow(newscArgN.trainSet)))
+scArgN.labels<-attr(scArgN.model$terms , "term.labels") 
+scArgN.num.fit <- length(scArgN.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for bbProN
+bbProN.vif<- vifstep(bbProN, 10) 
+bbProN.vifvar<-as.character(slot(bbProN.vif, "variables")) 
+newbbProN <- data.frame(accuracy, protein[c(which(variables %in% bbProN.vifvar))]) 
+
+
+# fitting the model
+# for bbProN
+newbbProN.trainSet <- newbbProN[trainInd,]
+newbbProN.validSet <- newbbProN[-trainInd,]
+
+bbProN.full <- lm(accuracy ~ ., data = newbbProN.trainSet)
+bbProN.empty <- lm(accuracy ~ 1, data =newbbProN.trainSet)
+
+bbProN.model<-stepAIC(object = bbProN.empty , scope = list(upper = bbProN.full, lower = bbProN.empty), direction = "forward", k = log(nrow(newbbProN.trainSet)))
+bbProN.labels<-attr(bbProN.model$terms , "term.labels") 
+bbProN.num.fit <- length(bbProN.labels) 
+
+###
+# finding cases of multicollinearity
+# for hydroxylO
+hydroxylO.vif<- vifstep(hydroxylO, 10) 
+hydroxylO.vifvar<-as.character(slot(hydroxylO.vif, "variables")) 
+newhydroxylO <- data.frame(accuracy, protein[c(which(variables %in% hydroxylO.vifvar))]) 
+
+
+# fitting the model
+# for hydroxylO
+newhydroxylO.trainSet <- newhydroxylO[trainInd,]
+newhydroxylO.validSet <- newhydroxylO[-trainInd,]
+
+hydroxylO.full <- lm(accuracy ~ ., data = newhydroxylO.trainSet)
+hydroxylO.empty <- lm(accuracy ~ 1, data =newhydroxylO.trainSet)
+
+hydroxylO.model<-stepAIC(object = hydroxylO.empty , scope = list(upper = hydroxylO.full, lower = hydroxylO.empty), direction = "forward", k = log(nrow(newhydroxylO.trainSet)))
+hydroxylO.labels<-attr(hydroxylO.model$terms , "term.labels") 
+hydroxylO.num.fit <- length(hydroxylO.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for carbonylO
+carbonylO.vif<- vifstep(carbonylO, 10) 
+carbonylO.vifvar<-as.character(slot(carbonylO.vif, "variables")) 
+newcarbonylO <- data.frame(accuracy, protein[c(which(variables %in% carbonylO.vifvar))]) 
+
+
+# fitting the model
+# for carbonylO
+newcarbonylO.trainSet <- newcarbonylO[trainInd,]
+newcarbonylO.validSet <- newcarbonylO[-trainInd,]
+
+carbonylO.full <- lm(accuracy ~ ., data = newcarbonylO.trainSet)
+carbonylO.empty <- lm(accuracy ~ 1, data =newcarbonylO.trainSet)
+
+carbonylO.model<-stepAIC(object = carbonylO.empty , scope = list(upper = carbonylO.full, lower = carbonylO.empty), direction = "forward", k = log(nrow(newcarbonylO.trainSet)))
+carbonylO.labels<-attr(carbonylO.model$terms , "term.labels") 
+carbonylO.num.fit <- length(carbonylO.labels) 
+
+###
+# finding cases of multicollinearity
+# for carboxylO
+carboxylO.vif<- vifstep(carboxylO, 10) 
+carboxylO.vifvar<-as.character(slot(carboxylO.vif, "variables")) 
+newcarboxylO <- data.frame(accuracy, protein[c(which(variables %in% carboxylO.vifvar))]) 
+
+
+# fitting the model
+# for carboxylO
+newcarboxylO.trainSet <- newcarboxylO[trainInd,]
+newcarboxylO.validSet <- newcarboxylO[-trainInd,]
+
+carboxylO.full <- lm(accuracy ~ ., data = newcarboxylO.trainSet)
+carboxylO.empty <- lm(accuracy ~ 1, data =newcarboxylO.trainSet)
+
+carboxylO.model<-stepAIC(object = carboxylO.empty , scope = list(upper = carboxylO.full, lower = carboxylO.empty), direction = "forward", k = log(nrow(newcarboxylO.trainSet)))
+carboxylO.labels<-attr(carboxylO.model$terms , "term.labels") 
+carboxylO.num.fit <- length(carboxylO.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for bbN
+bbN.vif<- vifstep(bbN, 10) 
+bbN.vifvar<-as.character(slot(bbN.vif, "variables")) 
+newbbN <- data.frame(accuracy, protein[c(which(variables %in% bbN.vifvar))]) 
+
+
+# fitting the model
+# for bbN
+newbbN.trainSet <- newbbN[trainInd,]
+newbbN.validSet <- newbbN[-trainInd,]
+
+bbN.full <- lm(accuracy ~ ., data = newbbN.trainSet)
+bbN.empty <- lm(accuracy ~ 1, data =newbbN.trainSet)
+
+bbN.model<-stepAIC(object = bbN.empty , scope = list(upper = bbN.full, lower = bbN.empty), direction = "forward", k = log(nrow(newbbN.trainSet)))
+bbN.labels<-attr(bbN.model$terms , "term.labels") 
+bbN.num.fit <- length(bbN.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for sulfur
+sulfur.vif<- vifstep(sulfur, 10) 
+sulfur.vifvar<-as.character(slot(sulfur.vif, "variables")) 
+newsulfur <- data.frame(accuracy, protein[c(which(variables %in% sulfur.vifvar))]) 
+
+
+# fitting the model
+# for sulfur
+newsulfur.trainSet <- newsulfur[trainInd,]
+newsulfur.validSet <- newsulfur[-trainInd,]
+
+sulfur.full <- lm(accuracy ~ ., data = newsulfur.trainSet)
+sulfur.empty <- lm(accuracy ~ 1, data =newsulfur.trainSet)
+
+sulfur.model<-stepAIC(object = sulfur.empty , scope = list(upper = sulfur.full, lower = sulfur.empty), direction = "forward", k = log(nrow(newsulfur.trainSet)))
+sulfur.labels<-attr(sulfur.model$terms , "term.labels") 
+sulfur.num.fit <- length(sulfur.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for bbCA
+bbCA.vif<- vifstep(bbCA, 10) 
+bbCA.vifvar<-as.character(slot(bbCA.vif, "variables")) 
+newbbCA <- data.frame(accuracy, protein[c(which(variables %in% bbCA.vifvar))]) 
+
+
+# fitting the model
+# for bbCA
+newbbCA.trainSet <- newbbCA[trainInd,]
+newbbCA.validSet <- newbbCA[-trainInd,]
+
+bbCA.full <- lm(accuracy ~ ., data = newbbCA.trainSet)
+bbCA.empty <- lm(accuracy ~ 1, data =newbbCA.trainSet)
+
+bbCA.model<-stepAIC(object = bbCA.empty , scope = list(upper = bbCA.full, lower = bbCA.empty), direction = "forward", k = log(nrow(newbbCA.trainSet)))
+bbCA.labels<-attr(bbCA.model$terms , "term.labels") 
+bbCA.num.fit <- length(bbCA.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for bbC
+bbC.vif<- vifstep(bbC, 10) 
+bbC.vifvar<-as.character(slot(bbC.vif, "variables")) 
+newbbC <- data.frame(accuracy, protein[c(which(variables %in% bbC.vifvar))]) 
+
+
+# fitting the model
+# for bbC
+newbbC.trainSet <- newbbC[trainInd,]
+newbbC.validSet <- newbbC[-trainInd,]
+
+bbC.full <- lm(accuracy ~ ., data = newbbC.trainSet)
+bbC.empty <- lm(accuracy ~ 1, data =newbbC.trainSet)
+
+bbC.model<-stepAIC(object = bbC.empty , scope = list(upper = bbC.full, lower = bbC.empty), direction = "forward", k = log(nrow(newbbC.trainSet)))
+bbC.labels<-attr(bbC.model$terms , "term.labels") 
+bbC.num.fit <- length(bbC.labels) 
+
+###
+
+# finding cases of multicollinearity
+# for bbO
+bbO.vif<- vifstep(bbO, 10) 
+bbO.vifvar<-as.character(slot(bbO.vif, "variables")) 
+newbbO <- data.frame(accuracy, protein[c(which(variables %in% bbO.vifvar))]) 
+
+
+# fitting the model
+# for bbO
+newbbO.trainSet <- newbbO[trainInd,]
+newbbO.validSet <- newbbO[-trainInd,]
+
+bbO.full <- lm(accuracy ~ ., data = newbbO.trainSet)
+bbO.empty <- lm(accuracy ~ 1, data =newbbO.trainSet)
+
+bbO.model<-stepAIC(object = bbO.empty , scope = list(upper = bbO.full, lower = bbO.empty), direction = "forward", k = log(nrow(newbbO.trainSet)))
+bbO.labels<-attr(bbO.model$terms , "term.labels") 
+bbO.num.fit <- length(bbO.labels) 
+
+new.variables <-c(carbonylC.labels, carboxylC.labels, aliph1HC.labels,
+                  aliph2HC.labels, aliph3HC.labels, aromaticC.labels,
+                  scAGN.labels, scLysN.labels, scArgN.labels,
+                  bbProN.labels, hydroxylO.labels, carbonylO.labels,
+                  carboxylO.labels, bbN.labels, sulfur.labels,
+                  bbCA.labels, bbC.labels, bbO.labels)
+
+new.vars <- unique(new.variables) #deletes all duplicates #387 explanatory vars left
+new.data <- data.frame(accuracy, angles, protein[c(which(variables %in% new.vars))]) 
+save(new.data, file="final.explanatory.vars.RData")
+
+explanatory<-new.data[,-1]
+
+vif1 <- vifstep(explanatory[1:200], 10) 
+vif1.vifvar<-as.character(slot(vif1, "variables")) 
+newvif1 <- data.frame(accuracy, angles, protein[c(which(variables %in% vif1.vifvar))]) 
+
+newvif1.trainSet <- newvif1[trainInd,]
+newvif1.validSet <- newvif1[-trainInd,]
+vif1.full <- lm(accuracy ~ ., data = newvif1.trainSet)
+vif1.empty <- lm(accuracy ~ 1, data =newvif1.trainSet)
+vif1.model<-stepAIC(object = vif1.empty , scope = list(upper = vif1.full, lower = vif1.empty), direction = "forward", k = log(nrow(newvif1.trainSet)))
+vif1.labels<-attr(vif1.model$terms , "term.labels") 
+vif1.num.fit <- length(vif1.labels) #63
+
+
+vif2 <- vifstep(explanatory[100:300], 10) 
+vif2.vifvar<-as.character(slot(vif2, "variables")) 
+newvif2 <- data.frame(accuracy, angles, protein[c(which(variables %in% vif2.vifvar))]) 
+
+newvif2.trainSet <- newvif2[trainInd,]
+newvif2.validSet <- newvif2[-trainInd,]
+vif2.full <- lm(accuracy ~ ., data = newvif2.trainSet)
+vif2.empty <- lm(accuracy ~ 1, data =newvif2.trainSet)
+vif2.model<-stepAIC(object = vif2.empty , scope = list(upper = vif2.full, lower = vif2.empty), direction = "forward", k = log(nrow(newvif2.trainSet)))
+vif2.labels<-attr(vif2.model$terms , "term.labels") 
+vif2.num.fit <- length(vif2.labels) #72
+
+
+
+vif3 <- vifstep(explanatory[200:387], 10) 
+vif3.vifvar<-as.character(slot(vif3, "variables")) 
+newvif3 <- data.frame(accuracy, angles, protein[c(which(variables %in% vif3.vifvar))]) 
+
+newvif3.trainSet <- newvif3[trainInd,]
+newvif3.validSet <- newvif3[-trainInd,]
+vif3.full <- lm(accuracy ~ ., data = newvif3.trainSet)
+vif3.empty <- lm(accuracy ~ 1, data =newvif3.trainSet)
+vif3.model<-stepAIC(object = vif3.empty , scope = list(upper = vif3.full, lower = vif3.empty), direction = "forward", k = log(nrow(newvif3.trainSet)))
+vif3.labels<-attr(vif3.model$terms , "term.labels") 
+vif3.num.fit <- length(vif3.labels) #58
+
+# total = 193 (including duplicates)
+
+final.variables<- c(vif1.labels ,vif2.labels, vif3.labels)
+final.vars <- unique(final.variables) #160
+final.data <- data.frame(accuracy, angles, protein[c(which(variables %in% final.vars))]) 
+save(final.data, file="final.vars.p2.RData")
+load("/Users/ewen/Documents/final.vars.p2.RData")
+#fitting the model via ICM and CV splitting
+
+# K fold cross validation to split model
+N <- nrow(final.data)
+K <- 5
+validSetSplits <- sample((1:N)%%K + 1)
+RMSE1 <- c()
+RMSE2 <- c()
+for (k in 1:K) {
+  validSet <- final.data[validSetSplits==k,]
+  trainSet <- final.data[validSetSplits!=k,]  
+  
+  pen <- log(nrow(trainSet)) 
+  varlist = c()
+  varnames = names(trainSet)
+  n = nrow(trainSet)
+  varorder <- sample(1:ncol(trainSet)) # random order of variables
+  minCrit = Inf
+  noChange = F
+  while (!noChange) {
+    noChange = T
+    for (i in varorder) { 
+      if (i == 1)
+        next
+      
+      if (i %in% varlist & length(varlist) > 1) {
+        index = c(1, varlist[varlist != i]) 
+        trainVars = trainSet[, index]
+        
+        fit = lm(accuracy ~ ., data = trainVars)
+        
+        if (AIC(fit, k = pen) < minCrit) {
+          minCrit = AIC(fit, k = pen)
+          varlist = varlist[varlist != i]
+          print(paste0("Criterion: ", round(minCrit, 1), ", variables: ", paste0(varnames[varlist], collapse = " ")))
+          best.model = fit
+          noChange = F
+        }
+        
+      } else if (!i %in% varlist) {
+        index = c(1, varlist, i) 
+        trainVars = trainSet[, index]
+        
+        fit = lm(accuracy ~ ., data = trainVars)
+        
+        if (AIC(fit, k = pen) < minCrit) {
+          minCrit = AIC(fit, k = pen)
+          varlist = c(varlist, i)
+          print(paste0("Criterion: ", round(minCrit, 1), ", variables: ", paste0(varnames[varlist], collapse = " ")))
+          best.model = fit
+          noChange = F
+        }      
+      }
+    }
+  }
+  
+  summary(best.model)
+  predICM <- predict(best.model, newdata = validSet)
+  RMSE1 [k]<- sqrt(mean((validSet$accuracy - predICM)^2)) # RMSE on validation
+  RMSE2 [k]<- sqrt(mean(best.model$residuals^2)) # RMSE on train
+  
+  
+}
+
+RMSE1 # 0.5595077 0.6177118 0.5933631 0.5781460 0.6244836
+RMSE2 # 0.5259364 0.5270795 0.5164792 0.5320736 0.5245309
+mean(RMSE1) # 0.5946425
+mean(RMSE2) # 0.5252199
+
+
+fitted.model<- summary(best.model)
+fitted.vars<- attr(fitted.model$terms , "term.labels") #65 explanatory variables
+
+#r.sq 0.8733995
+
+final.model <- lm( accuracy ~ scArgN_bbCA_medshort + scArgN_bbC_vlong + 
+                    scArgN_bbCA_vlong + aliph1HC_hydroxylO_long + aromaticC_aromaticC_vlong + 
+                    aliph1HC_aromaticC_long + aliph1HC_aromaticC_short + scArgN_bbC_short + 
+                    aliph1HC_aromaticC_medlong + scArgN_bbO_medshort + carbonylO_carbonylO_long + 
+                    aliph1HC_bbC_long + sulfur_bbC_medlong + aliph1HC_hydroxylO_vlong + 
+                    bbN_bbN_medlong + aliph3HC_bbN_short + bbO_bbO_short + aliph3HC_aliph3HC_short + 
+                    bbProN_bbO_long + aliph3HC_sulfur_medshort + aliph1HC_hydroxylO_medlong + 
+                    bbN_bbN_medshort + scLysN_bbN_vlong + bbN_bbN_long + scLysN_carboxylO_long + 
+                    bbN_bbO_long + sulfur_bbC_vlong + aliph2HC_scLysN_medshort + 
+                    scLysN_bbCA_long + aliph2HC_aromaticC_medshort + scLysN_bbC_vlong + 
+                    bbCA_bbO_vshort + +aliph2HC_aromaticC_vlong + aromaticC_sulfur_medlong + 
+                    aliph2HC_bbN_medshort + aliph3HC_sulfur_medlong + aliph1HC_aliph2HC_long + 
+                    aliph3HC_bbC_vlong + aromaticC_scAGN_short + aromaticC_hydroxylO_medlong + 
+                    aliph1HC_bbProN_medlong + scAGN_bbN_long + scArgN_bbO_medlong + 
+                    aliph1HC_aromaticC_vlong + scAGN_bbN_medlong + aromaticC_hydroxylO_long + 
+                    aliph1HC_sulfur_short + aliph2HC_aliph3HC_vlong + carboxylO_bbCA_long + 
+                    aliph1HC_bbC_medlong + aliph1HC_bbO_long + carboxylO_carboxylO_vlong + 
+                    scArgN_bbN_medlong + aliph1HC_aromaticC_medshort + carbonylC_bbC_medlong + 
+                    aromaticC_hydroxylO_medshort + aliph3HC_aromaticC_long + 
+                    aliph1HC_bbProN_long + aliph1HC_bbProN_vlong + aromaticC_bbCA_vlong + 
+                    carboxylO_bbO_long + scArgN_bbN_long + aromaticC_scLysN_vlong + 
+                    aliph3HC_bbN_medlong + aliph1HC_bbC_vlong, data = protein)
+
+
+predictions <- predict(final.model, newdata = protein.test)
+writeLines(as.character(predictions), "mypredictions.txt")
+
+
+
+
+
+
+
+
+
+
